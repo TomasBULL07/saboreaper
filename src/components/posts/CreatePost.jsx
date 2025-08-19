@@ -70,9 +70,9 @@ const CreatePost = ({
       setIsSubmitting(false);
     }
   };
-  if (!user) return null;
+  if (!user?.name) return null;
   if (!isExpanded) {
-    return <Card className="bg-card border-border mb-6"><CardContent className="p-4"><div className="flex items-center space-x-3"><Avatar className="h-10 w-10"><AvatarImage src={user.avatar} /><AvatarFallback className="bg-primary text-primary-foreground">{user.name.charAt(0)}</AvatarFallback></Avatar><button
+    return <Card className="bg-card border-border mb-6"><CardContent className="p-4"><div className="flex items-center space-x-3"><Avatar className="h-10 w-10"><AvatarImage src={user.avatar} /><AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) ?? 'U'}</AvatarFallback></Avatar><button
       onClick={onExpand}
       className="flex-1 text-left px-4 py-2 bg-secondary rounded-full text-muted-foreground hover:bg-secondary/80 transition-colors"
     >
@@ -81,7 +81,7 @@ const CreatePost = ({
   }
   return <Card className="bg-card border-border mb-6"><CardContent className="p-6"><form onSubmit={handleSubmit} className="space-y-4">{
     /* Header */
-  }<div className="flex items-center justify-between"><div className="flex items-center space-x-3"><Avatar className="h-10 w-10"><AvatarImage src={user.avatar} /><AvatarFallback className="bg-primary text-primary-foreground">{user.name.charAt(0)}</AvatarFallback></Avatar><div><h3 className="font-semibold text-foreground">{user.name}</h3><div className="flex items-center space-x-1"><Badge variant="secondary" className="text-xs">{user.type === "restaurante" ? "Restaurante" : "Foodie"}</Badge>{user.type === "restaurante" && <Badge className="bg-primary text-primary-foreground text-xs">✓</Badge>}</div></div></div>{onClose && <Button
+    }<div className="flex items-center justify-between"><div className="flex items-center space-x-3"><Avatar className="h-10 w-10"><AvatarImage src={user.avatar} /><AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) ?? 'U'}</AvatarFallback></Avatar><div><h3 className="font-semibold text-foreground">{user.name}</h3><div className="flex items-center space-x-1"><Badge variant="secondary" className="text-xs">{user.type === "restaurante" ? "Restaurante" : "Foodie"}</Badge>{user.type === "restaurante" && <Badge className="bg-primary text-primary-foreground text-xs">✓</Badge>}</div></div></div>{onClose && <Button
     type="button"
     variant="ghost"
     size="icon"
