@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/config/firebase-config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { useNavigate } from "react-router-dom";
 const LoginForm = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,7 @@ const LoginForm = ({ onSwitchToRegister }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -30,6 +32,7 @@ const LoginForm = ({ onSwitchToRegister }) => {
         title: "\xA1Bienvenido!",
         description: "Has iniciado sesi\xF3n correctamente."
       });
+      navigate("/dashboard");
     } catch (error) {
       let description = "Error al iniciar sesi\xF3n. Intenta de nuevo.";
       if (error instanceof FirebaseError) {
