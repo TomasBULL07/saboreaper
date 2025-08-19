@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Utensils } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { auth, db } from "@/config/firebase-config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 const RegisterForm = ({ onSwitchToLogin }) => {
   const [step, setStep] = useState(1);
@@ -15,8 +17,8 @@ const RegisterForm = ({ onSwitchToLogin }) => {
     username: "",
     isRestaurant: false
   });
-  const { register, isLoading } = useAuth();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (step === 1) {
@@ -40,9 +42,18 @@ const RegisterForm = ({ onSwitchToLogin }) => {
   };
   const handleRegistration = async () => {
     try {
-      await register({
-        ...formData,
-        type: formData.isRestaurant ? "restaurante" : "cliente"
+      setIsLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      const role = formData.isRestaurant ? "restaurante" : "cliente";
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        name: formData.name,
+        username: formData.username,
+        role,
+        email: formData.email
       });
       toast({
         title: "\xA1Registro exitoso!",
@@ -50,11 +61,19 @@ const RegisterForm = ({ onSwitchToLogin }) => {
       });
     } catch (error) {
       console.error("Registration error:", error);
+      let description = "No se pudo crear la cuenta. Intenta de nuevo.";
+      if (error.code === "auth/email-already-in-use") {
+        description = "El correo ya está registrado.";
+      } else if (error.code === "auth/weak-password") {
+        description = "La contrase\u00f1a es muy d\u00e9bil.";
+      }
       toast({
         title: "Error",
-        description: "No se pudo crear la cuenta. Intenta de nuevo.",
+        description,
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
   const updateFormData = (field, value) => {

@@ -1,7 +1,10 @@
+// Firebase configuration and initialization
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Configuration values are expected to be provided via environment variables
+// available through Vite's import.meta.env.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -11,6 +14,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Initialize Firebase app and commonly used services.
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
