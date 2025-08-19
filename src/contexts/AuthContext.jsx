@@ -10,11 +10,20 @@ const useAuth = () => {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const setAuthUser = (userData) => {
+    setUser(userData);
+    if (userData) {
+      localStorage.setItem("saborea_user", JSON.stringify(userData));
+    } else {
+      localStorage.removeItem("saborea_user");
+    }
+  };
   useEffect(() => {
     const savedUser = localStorage.getItem("saborea_user");
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        setAuthUser(JSON.parse(savedUser));
       } catch (error) {
         console.error("Error parsing saved user:", error);
         localStorage.removeItem("saborea_user");
@@ -39,8 +48,7 @@ const AuthProvider = ({ children }) => {
         favoriteRestaurant: isRestaurant ? void 0 : "La Cocina del Chef",
         cuisine: isRestaurant ? "Casera" : void 0
       };
-      setUser(mockUser);
-      localStorage.setItem("saborea_user", JSON.stringify(mockUser));
+      setAuthUser(mockUser);
     } catch (error) {
       console.error("Login error:", error);
       throw new Error("Error al iniciar sesi\xF3n");
@@ -69,8 +77,7 @@ const AuthProvider = ({ children }) => {
         cuisine: isRestaurant ? userData.cuisine || "Variada" : void 0
       };
       console.log("Created user:", newUser);
-      setUser(newUser);
-      localStorage.setItem("saborea_user", JSON.stringify(newUser));
+      setAuthUser(newUser);
       console.log("Registration completed successfully");
     } catch (error) {
       console.error("Registration error:", error);
@@ -80,10 +87,9 @@ const AuthProvider = ({ children }) => {
     }
   };
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem("saborea_user");
+    setAuthUser(null);
   };
-  return <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, register, logout, isLoading, setUser: setAuthUser }}>{children}</AuthContext.Provider>;
 };
 export {
   AuthProvider,

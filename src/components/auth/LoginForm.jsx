@@ -5,26 +5,55 @@ import { Card } from "@/components/ui/card";
 import { Utensils } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { auth } from "@/config/firebase-config";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 const LoginForm = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [forgotPassword, setForgotPassword] = useState(false);
-  const { login, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuth();
   const { toast } = useToast();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      await login(email, password);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = {
+        uid: credential.user.uid,
+        email: credential.user.email,
+        displayName: credential.user.displayName
+      };
+      setUser(firebaseUser);
       toast({
         title: "\xA1Bienvenido!",
         description: "Has iniciado sesi\xF3n correctamente."
       });
     } catch (error) {
+      let description = "Error al iniciar sesi\xF3n. Intenta de nuevo.";
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case "auth/invalid-credential":
+          case "auth/wrong-password":
+          case "auth/user-not-found":
+            description = "Email o contrase\xF1a incorrectos.";
+            break;
+          case "auth/invalid-email":
+            description = "El correo electr\xF3nico no es v\xE1lido.";
+            break;
+          case "auth/user-disabled":
+            description = "La cuenta est\xE1 deshabilitada.";
+            break;
+        }
+      }
       toast({
         title: "Error",
-        description: "Email o contrase\xF1a incorrectos.",
+        description,
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleForgotPassword = () => {
