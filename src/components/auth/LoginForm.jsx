@@ -20,12 +20,19 @@ const LoginForm = ({ onSwitchToRegister }) => {
     setIsLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
-      const firebaseUser = {
-        uid: credential.user.uid,
+      const appUser = {
+        id: credential.user.uid,
         email: credential.user.email,
-        displayName: credential.user.displayName
+        name: credential.user.displayName || credential.user.email,
+        username: credential.user.email ? credential.user.email.split("@")[0] : "",
+        type: "cliente",
+        avatar: credential.user.photoURL || "",
+        bio: "",
+        location: "",
+        favoriteRestaurant: "",
+        cuisine: ""
       };
-      setUser(firebaseUser);
+      setUser(appUser);
       toast({
         title: "\xA1Bienvenido!",
         description: "Has iniciado sesi\xF3n correctamente."
